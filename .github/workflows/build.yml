@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: "ghcr.io"
-  IMAGE_NAME: "${{ github.repository }}"
+  NAME: "${{ github.repository }}"
 
 jobs:
   "build-and-push-image":
@@ -17,6 +17,10 @@ jobs:
       packages: "write"
 
     steps:
+      - name: "Extract lower-case image name"
+        id: "lowercaser"
+        run: "echo \"name=${NAME}\" | tr '[[:upper:]]' '[[:lower:]' >> \"${GITHUB_OUTPUT}\""
+      
       - name: "Checkout repository"
         uses: "actions/checkout@v4"
 
@@ -34,6 +38,6 @@ jobs:
         uses: "docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4"
         with:
           context: "."
-          tags: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          tags: "${{ env.REGISTRY }}/${{ steps.lowercaser.outputs.name }}:latest"
           platforms: "linux/amd64,linux/arm64"
           push: true

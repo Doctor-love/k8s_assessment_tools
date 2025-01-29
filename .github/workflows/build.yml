@@ -1,44 +1,39 @@
-name: Create and publish container images
+name: "Create and publish container images"
 
 on:
   push:
-    branches: ['master']
+    branches:
+      - "master"
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  REGISTRY: "ghcr.io"
+  IMAGE_NAME: "${{ github.repository }}"
 
 jobs:
-  build-and-push-image:
-    runs-on: ubuntu-24.04
+  "build-and-push-image":
+    runs-on: "ubuntu-24.04"
     permissions:
-      contents: read
-      packages: write
+      contents: "read"
+      packages: "write"
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: "Checkout repository"
+        uses: "actions/checkout@v4"
 
-      - name: Setup QEMU for Docker
-        uses: docker/setup-qemu-action@f30d974279f970cd3ed4ee3bcf1ff7795e271f00
+      - name: "Setup QEMU for Docker"
+        uses: "docker/setup-qemu-action@f30d974279f970cd3ed4ee3bcf1ff7795e271f00"
         
-      - name: Log in to the Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      - name: "Log in to the Container registry"
+        uses: "docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1"
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: "${{ env.REGISTRY }}"
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Extract metadata (tags, labels) for Docker
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+      - name: "Build and push Docker image"
+        uses: "docker/build-push-action@f2ad5e99d037542a71f64918e516c093c6f3fc4"
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: .
+          context: "."
+          tags: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          platforms: "linux/amd64,linux/arm64"
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64

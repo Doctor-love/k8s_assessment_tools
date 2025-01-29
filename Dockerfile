@@ -5,7 +5,7 @@
 FROM docker.io/library/ubuntu:24.04
 
 # Set to "amd64" or "arm64" to download/build appropriate artifacts
-ARG TARGETARCH="amd64"
+ARG TARGETARCH
 
 # Installation of "base packages"
 RUN \
